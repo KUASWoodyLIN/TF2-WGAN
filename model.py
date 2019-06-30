@@ -11,11 +11,11 @@ def _get_norm_layer(norm):
         return tfa.layers.InstanceNormalization
     elif norm == 'layer_norm':
         # return tfa.layers.LayerNormalization
-        return keras.layers.LayerNormalization
+        return tfa.layers.LayerNormalization
 
 
 def Generator(input_shape=(1, 1, 128),
-              norm='batch_norm',
+              norm='instance_norm',
               name='Generator'):
     Norm = _get_norm_layer(norm)
     inputs = keras.Input(shape=input_shape)
@@ -44,7 +44,7 @@ def Generator(input_shape=(1, 1, 128),
 
 
 def Discriminator(input_shape=(64, 64, 3),
-                  norm='batch_norm',
+                  norm='instance_norm',
                   name='Discriminator'):
     Norm = _get_norm_layer(norm)
 

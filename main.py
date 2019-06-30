@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_datasets as tfds
 from functools import partial
-
+import cv2
 from dataset import parse_fn
 from loss import generator_loss, discriminator_loss, gradient_penalty
 from model import Generator, Discriminator
@@ -26,7 +26,7 @@ gradient_penalty_weight = 10.0
 # Load datasets and setting
 AUTOTUNE = tf.data.experimental.AUTOTUNE  # 自動調整模式
 combine_split = tfds.Split.TRAIN + tfds.Split.VALIDATION + tfds.Split.TEST
-train_data = tfds.load(dataset, split=combine_split, data_dir='/home/share/dataset/tensorflow-datasets')
+train_data, info = tfds.load(dataset, split=combine_split, data_dir='/home/share/dataset/tensorflow-datasets', with_info=True)
 train_data = train_data.shuffle(1000)
 train_data = train_data.map(parse_fn, num_parallel_calls=AUTOTUNE)
 train_data = train_data.batch(batch_size, drop_remainder=True)      # 如果最後一批資料小於batch_size，則捨棄該批資料
@@ -81,10 +81,10 @@ def train_discriminator(real_img):
 
 
 def combine_images(images, col=10, row=10):
-    images = (images + 1) /2
+    images = (images + 1) / 2
     images = images.numpy()
     b, h, w, _ = images.shape
-    images_combine = np.zeros(shape=(h*col, w*row, 3), dtype=np.float32)
+    images_combine = np.zeros(shape=(h*col, w*row, 3))
     for y in range(col):
         for x in range(row):
             images_combine[y*h:(y+1)*h, x*w:(x+1)*w] = images[x+y*row]
@@ -93,11 +93,15 @@ def combine_images(images, col=10, row=10):
 
 def train_wgan():
     # Create tensorboard logs
+    model_dir = log_dirs + '/models/'
+    images_dir = log_dirs + '/images/'
+    os.makedirs(model_dir, exist_ok=True)
+    os.makedirs(images_dir, exist_ok=True)
     summary_writer = tf.summary.create_file_writer(log_dirs)
 
     # Create fixed noise for sampling
     sample_noise = tf.random.normal((100, 1, 1, z_dim))
-    for epoch in range(50):
+    for epoch in range(25):
         for step, real_img in enumerate(train_data):
             # training discriminator
             d_loss, gp = train_discriminator(real_img)
@@ -122,10 +126,12 @@ def train_wgan():
                     with summary_writer.as_default():
                         # tf.summary.image(dataset, [save_img], step='iter-{}'.format(g_optimizer.iterations))
                         tf.summary.image(dataset, [save_img], step=g_optimizer.iterations)
+                        save_img = save_img * 255.
+                        cv2.imwrite(images_dir + 'iter-{}.png'.format(g_optimizer.iterations.numpy()), save_img[..., ::-1])
 
         # save model
         if epoch != 0:
-            generator.save_weights("generator-epochs-{}.h5".format(epoch))
+            generator.save_weights(model_dir + "generator-epochs-{}.h5".format(epoch))
 
 
 if __name__ == '__main__':
@@ -134,4 +140,6 @@ if __name__ == '__main__':
     #     print('Start of epoch {}'.format(epoch))
     #     for step, real_img in enumerate(train_data):
     #         print(real_img.shape)
+    #         save = (real_img.numpy()[0] + 1) * 127.5
+    #         cv2.imwrite('test.png', save[..., ::-1])
     #         assert real_img.shape[0] == 64
