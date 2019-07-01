@@ -3,15 +3,15 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 from functools import partial
 import cv2
-from dataset import parse_fn
-from loss import generator_loss, discriminator_loss, gradient_penalty
-from model import Generator, Discriminator
+from utils.dataset import parse_fn
+from utils.losses import generator_loss, discriminator_loss, gradient_penalty
+from utils.models import Generator, Discriminator
 
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 dataset = 'celeb_a'     # 'cifar10', 'fashion_mnist', 'mnist'
-log_dirs = 'logs_wgan'
+log_dirs = 'logs_wgan_2'
 batch_size = 64
 # learning rate
 lr = 0.0002
@@ -39,8 +39,8 @@ generator.summary()
 discriminator.summary()
 
 # Create optimizers
-g_optimizer = tf.keras.optimizers.RMSprop(lr)
-d_optimizer = tf.keras.optimizers.RMSprop(lr)
+g_optimizer = tf.keras.optimizers.Adam(lr, beta_1=0.5)
+d_optimizer = tf.keras.optimizers.Adam(lr, beta_1=0.5)
 
 
 @tf.function
@@ -94,9 +94,7 @@ def combine_images(images, col=10, row=10):
 def train_wgan():
     # Create tensorboard logs
     model_dir = log_dirs + '/models/'
-    images_dir = log_dirs + '/images/'
     os.makedirs(model_dir, exist_ok=True)
-    os.makedirs(images_dir, exist_ok=True)
     summary_writer = tf.summary.create_file_writer(log_dirs)
 
     # Create fixed noise for sampling
@@ -124,10 +122,7 @@ def train_wgan():
                     save_img = combine_images(x_fake)
                     # save fake images
                     with summary_writer.as_default():
-                        # tf.summary.image(dataset, [save_img], step='iter-{}'.format(g_optimizer.iterations))
                         tf.summary.image(dataset, [save_img], step=g_optimizer.iterations)
-                        save_img = save_img * 255.
-                        cv2.imwrite(images_dir + 'iter-{}.png'.format(g_optimizer.iterations.numpy()), save_img[..., ::-1])
 
         # save model
         if epoch != 0:
