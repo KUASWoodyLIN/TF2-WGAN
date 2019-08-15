@@ -15,7 +15,7 @@ log_dirs = 'logs_wgan_2'
 batch_size = 64
 # learning rate
 lr = 0.0002
-# Random vector noise size
+# Random vector size
 z_dim = 128
 # Critic updates per generator update
 n_dis = 5
@@ -47,9 +47,9 @@ d_optimizer = tf.keras.optimizers.Adam(lr, beta_1=0.5)
 def train_generator():
     with tf.GradientTape() as tape:
         # sample data
-        noise = tf.random.normal(shape=(batch_size, 1, 1, z_dim))
+        random_vector = tf.random.normal(shape=(batch_size, 1, 1, z_dim))
         # create image
-        fake_img = generator(noise, training=True)
+        fake_img = generator(random_vector, training=True)
         # predict real or fake
         fake_logit = discriminator(fake_img, training=True)
         # calculate generator loss
@@ -97,8 +97,8 @@ def train_wgan():
     os.makedirs(model_dir, exist_ok=True)
     summary_writer = tf.summary.create_file_writer(log_dirs)
 
-    # Create fixed noise for sampling
-    sample_noise = tf.random.normal((100, 1, 1, z_dim))
+    # Create fixed Random vector for sampling
+    sample_random_vector = tf.random.normal((100, 1, 1, z_dim))
     for epoch in range(25):
         for step, real_img in enumerate(train_data):
             # training discriminator
@@ -118,7 +118,7 @@ def train_wgan():
 
                 # save sample
                 if g_optimizer.iterations.numpy() % 100 == 0:
-                    x_fake = generator(sample_noise, training=False)
+                    x_fake = generator(sample_random_vector, training=False)
                     save_img = combine_images(x_fake)
                     # save fake images
                     with summary_writer.as_default():
