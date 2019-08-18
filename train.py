@@ -14,7 +14,7 @@ dataset = 'celeb_a'     # 'cifar10', 'fashion_mnist', 'mnist'
 log_dirs = 'logs_wgan_2'
 batch_size = 64
 # learning rate
-lr = 0.0002
+lr = 0.0001
 # Random vector size
 z_dim = 128
 # Critic updates per generator update
@@ -39,8 +39,8 @@ generator.summary()
 discriminator.summary()
 
 # Create optimizers
-g_optimizer = tf.keras.optimizers.Adam(lr, beta_1=0.5)
-d_optimizer = tf.keras.optimizers.Adam(lr, beta_1=0.5)
+g_optimizer = tf.keras.optimizers.Adam(lr, beta_1=0.5, beta_2=0.9)
+d_optimizer = tf.keras.optimizers.Adam(lr, beta_1=0.5, beta_2=0.9)
 
 
 @tf.function
