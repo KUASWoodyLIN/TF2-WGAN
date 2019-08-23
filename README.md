@@ -20,14 +20,16 @@
 
 ## Results
 1. 100 Iteratives
-![100 Iteratives](./images/iter-100.png)
+
+<img src="./images/iter-100.png" width="50%" height="50%"/>
 
 2. 1000 Iteratives
-![1000 Iteratives](./images/iter-1000.png)
+
+<img src="./images/iter-1000.png" width="50%" height="50%"/>
 
 3. 15800 Iteratives
-![15800 Iteratives](./images/iter-15800.png)
 
+<img src="./images/iter-15800.png" width="50%" height="50%"/>
 
 TensorBoard Output
 ![Tensorboard Output](./images/Tensorboard.png)
