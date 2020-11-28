@@ -25,8 +25,7 @@ gradient_penalty_weight = 10.0
 
 # Load datasets and setting
 AUTOTUNE = tf.data.experimental.AUTOTUNE  # 自動調整模式
-combine_split = tfds.Split.TRAIN + tfds.Split.VALIDATION + tfds.Split.TEST
-train_data, info = tfds.load(dataset, split=combine_split, data_dir='/home/share/dataset/tensorflow-datasets', with_info=True)
+train_data, info = tfds.load(dataset, split='train+validation+test', with_info=True)
 train_data = train_data.shuffle(1000)
 train_data = train_data.map(parse_fn, num_parallel_calls=AUTOTUNE)
 train_data = train_data.batch(batch_size, drop_remainder=True)      # 如果最後一批資料小於batch_size，則捨棄該批資料
