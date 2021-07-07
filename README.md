@@ -4,9 +4,9 @@
 ## Usage
 
 - Requirements
-    - [Numpy](http://www.numpy.org/)
-    - [TensorFlow >= 2.0](https://www.tensorflow.org/versions/r2.0/api_docs/python/tf)
-    - [TensorFlow Datasets](https://www.tensorflow.org/datasets/)
+    - [Numpy == 1.19.5](http://www.numpy.org/)
+    - [TensorFlow == 2.5.0](https://www.tensorflow.org/versions/r2.0/api_docs/python/tf)
+    - [TensorFlow Datasets == 4.3.0](https://www.tensorflow.org/datasets/)
 
 - Training WGAN-GP
     ```bash
